@@ -13,64 +13,64 @@ class Point():
         self.data = data
         
     def __add__(self, other):
-        return self.space.__add__(self.data, other.data)
+        return self.space.point_add(self.data, other.data)
     
     def __and__(self, other):
-        return self.space.__and__(self.data, other.data)
+        return self.space.point_and(self.data, other.data)
     
     def __floordiv__(self, other):
-        return self.space.__floordiv__(self.data, other.data)
+        return self.space.point_floordiv(self.data, other.data)
     
     def __iadd__(self, other):
-        return self.space.__iadd__(self.data, other.data)
+        return self.space.point_iadd(self.data, other.data)
     
     def __imul__(self, other):
-        return self.space.__imul__(self.data, other.data)
+        return self.space.point_imul(self.data, other.data)
     
     def __invert__(self, other):
-        return self.space.__invert__(self.data, other.data)
+        return self.space.point_invert(self.data, other.data)
     
     def __ipow__(self, other):
-        return self.space.__ipow__(self.data, other.data)
+        return self.space.point_ipow(self.data, other.data)
     
     def __isub__(self, other):
-        return self.space.__isub__(self.data, other.data)
+        return self.space.point_isub(self.data, other.data)
     
     def __mod__(self, other):
-        return self.space.__mod__(self.data, other.data)
+        return self.space.point_mod(self.data, other.data)
     
     def __mul__(self, other):
-        return self.space.__mul__(self.data, other.data)
+        return self.space.point_mul(self.data, other.data)
     
     def __or__(self, other):
-        return self.space.__or__(self.data, other.data)
+        return self.space.point_or(self.data, other.data)
     
     def __pow__(self, other):
-        return self.space.__pow__(self.data, other.data)
+        return self.space.point_pow(self.data, other.data)
     
     def __radd__(self, other):
-        return self.space.__radd__(self.data, other.data)
+        return self.space.point_radd(self.data, other.data)
     
     def __repr__(self):
         return f'Point(space = {self.space}, data = {self.data})'
     
     def __rmod__(self, other):
-        return self.space.__rmod__(self.data, other.data)
+        return self.space.point_rmod(self.data, other.data)
     
     def __rmul__(self, other):
-        return self.space.__rmul__(self.data, other.data)
+        return self.space.point_rmul(self.data, other.data)
     
     def __rpow__(self, other):
-        return self.space.__rpow__(self.data, other.data)
+        return self.space.point_rpow(self.data, other.data)
     
     def __rsub__(self, other):
-        return self.space.__rsub__(self.data, other.data)
+        return self.space.point_rsub(self.data, other.data)
     
     def __sub__(self, other):
-        return self.space.__sub__(self.data, other.data)
+        return self.space.point_sub(self.data, other.data)
 
     def __truediv__(self, other):
-        return self.space.__trudiv__(self.data, other.data)
+        return self.space.point_truediv(self.data, other.data)
 
 class Block():
     def __init__(self, name, domains = [], codomains = [], fn = None):
@@ -102,9 +102,15 @@ class Block():
         return new_points
 
 class Space():
-    def __new__(cls, name, dimensions = {}, metrics = {}, constraints = {}):
-        return type(name, (cls, ), {"name": name, "dimensions": dimensions, "metrics": metrics, "constraints": constraints})
+    def __new__(cls, name, dimensions = {}, metrics = {}, constraints = {}, projections = {}):
+        return type(name, (cls, ), {"name": name, "dimensions": dimensions, "metrics": metrics, "constraints": constraints, "projections": projections})
     
+    @classmethod
+    def cartesian(cls, name, other):
+        dimensions = cls.dimensions.copy()
+        dimensions.update(other.dimensions)
+        return type(name, (cls, ), {"name": name, "dimensions": dimensions})
+
     @classmethod
     def add_constraint(cls, block):
         if type(block) != Block:
@@ -114,15 +120,17 @@ class Space():
     
     @classmethod
     def add_metric(cls, block):
-        pass
+        if type(block) != Block:
+            raise Exception("Metric is not a block")
+            
+        cls.metrics[block.name] = block
     
     @classmethod
     def add_projection(cls, block):
-        pass
-        
-    @classmethod
-    def add_point(cls, point):
-        pass
+        if type(block) != Block:
+            raise Exception("Projection is not a block")
+            
+        cls.projections[block.name] = block
         
     @classmethod
     def create_constraint(cls, name, domains, fn):
@@ -152,79 +160,79 @@ class Space():
     
     @classmethod
     def define_add(cls, fn):
-        cls.__add__ = fn
+        cls.point_add = fn
         
     @classmethod
     def define_and(cls, fn):
-        cls.__and__ = fn
+        cls.point_and = fn
         
     @classmethod
     def define_floordiv(cls, fn):
-        cls.__floordiv__ = fn
+        cls.point_floordiv = fn
         
     @classmethod
     def define_iadd(cls, fn):
-        cls.__iadd__ = fn
+        cls.point_iadd = fn
         
     @classmethod
     def define_imul(cls, fn):
-        cls.__imul__ = fn
+        cls.point_imul = fn
         
     @classmethod
     def define_inv(cls, fn):
-        cls.__invert__ = fn
+        cls.point_invert = fn
         
     @classmethod
     def define_ipow(cls, fn):
-        cls.__ipow__ = fn
+        cls.point_ipow = fn
         
     @classmethod
     def define_isub(cls, fn):
-        cls.__isub__ = fn
-        
+        cls.point_isub = fn
+       
     @classmethod
     def define_mod(cls, fn):
-        cls.__mod__ = fn
+        cls.point_mod = fn
     
     @classmethod
     def define_mul(cls, fn):
-        cls.__mul__ = fn
+        cls.point_mul = fn
         
     @classmethod
     def define_or(cls, fn):
-        cls.__or__ = fn
+        cls.point_or = fn
         
     @classmethod
     def define_pow(cls, fn):
-        cls.__pow__ = fn
+        cls.point_pow = fn
         
     @classmethod
     def define_radd(cls, fn):
-        cls.__radd__ = fn
+        cls.point_radd = fn
         
     @classmethod
     def define_rmod(cls, fn):
-        cls.__rmod__ = fn
+        cls.point_rmod = fn
         
     @classmethod
     def define_rmul(cls, fn):
-        cls.__rmul__ = fn
+        cls.point_rmul = fn
         
     @classmethod
     def define_rpow(cls, fn):
-        cls.__rpow__ = fn
+        cls.point_rpow = fn
         
     @classmethod
     def define_rsub(cls, fn):
-        cls.__rsub__ = fn
+        cls.point_rsub = fn
         
     @classmethod
     def define_sub(cls, fn):
-        cls.__sub__ = fn
+        cls.point_sub = fn
         
     @classmethod
     def define_truediv(cls, fn):
-        cls.__truediv__ = fn
+        cls.point_truediv = fn
 
 # Primitive Spaces
 Bit = Space("Bit", {"bit": bool})
